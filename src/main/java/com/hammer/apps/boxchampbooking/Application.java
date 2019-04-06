@@ -1,5 +1,6 @@
 package com.hammer.apps.boxchampbooking;
 
+import com.hammer.apps.boxchampbooking.component.AuthenticationService;
 import com.hammer.apps.boxchampbooking.component.BookingService;
 import com.hammer.apps.boxchampbooking.exception.MissingArgumentException;
 import com.hammer.apps.boxchampbooking.model.Booking;
@@ -11,6 +12,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
+import org.springframework.http.HttpEntity;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestTemplate;
 
@@ -24,9 +26,11 @@ public class Application {
 	private static final String ARGUMENT_CLASS_TYPE = "classType";
 
 	private final BookingService bookingService;
+	private final AuthenticationService authenticationService;
 
-	public Application(BookingService bookingService) {
+	public Application(BookingService bookingService, AuthenticationService authenticationService) {
 		this.bookingService = bookingService;
+		this.authenticationService = authenticationService;
 	}
 
 	public static void main(String[] args) {
@@ -50,8 +54,10 @@ public class Application {
 			user.setUsername(username);
 			user.setPassword(password);
 
+			HttpEntity authorizedEntity = authenticationService.login(restTemplate, user);
+
 			Booking booking = new Booking(user, classType);
-			bookingService.bookClass(restTemplate, booking);
+			bookingService.bookClass(restTemplate, booking, authorizedEntity);
 		};
 	}
 
