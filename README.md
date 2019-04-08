@@ -18,6 +18,6 @@ Java 8 and Maven are required to build the application.
 
 `java -Xmx64m -Xss256k -jar target/boxchamp-booking-0.0.1-SNAPSHOT.jar --username=myboxchamp@email.com --password=mypassword --classType=endurance`
 
-`username` = your boxchamp username which is basically your e-mail address
-`password` = your users password
-`classType` = the type of class you want to book in advance (currently Endurance and Olympic_Lifting is supported)
+`username` = your boxchamp username which is basically your e-mail address  
+`password` = your users password  
+`classType` = the type of class you want to book in advance (currently `Endurance` and `Olympic_Lifting` are supported)
