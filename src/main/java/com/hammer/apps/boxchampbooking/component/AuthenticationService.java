@@ -23,7 +23,7 @@ public class AuthenticationService {
 	private static final String QUERY_PARAM_PASSWORD = "txPassword";
 
 
-	public HttpEntity login(RestTemplate restTemplate, User user) {
+	public HttpEntity authenticate(RestTemplate restTemplate, User user) {
 		String sessionCookie = getSessionCookie(restTemplate, user);
 		HttpHeaders getHeaders = getGetHeaders(sessionCookie);
 		return new HttpEntity(getHeaders);
