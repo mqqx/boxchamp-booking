@@ -15,7 +15,6 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
-import java.util.Objects;
 
 @Service
 public class AuthenticationService {
@@ -50,7 +49,7 @@ public class AuthenticationService {
 			sessionCookie = setCookieValues.get(setCookieValues.size() - 1);
 		}
 
-		boolean hasLoginFailed = loginResponse.hasBody() && Objects.requireNonNull(loginResponse.getBody()).contains("login_errors");
+		boolean hasLoginFailed = loginResponse.hasBody() && loginResponse.getBody().contains("login_errors");
 
 		if (hasLoginFailed || StringUtils.isEmpty(sessionCookie)) {
 			throw new BadCredentialsException("User " + user.getUsername() + " could not be logged in. Please check username/password combination.");
