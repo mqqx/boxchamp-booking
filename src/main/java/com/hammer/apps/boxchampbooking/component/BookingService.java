@@ -37,9 +37,9 @@ public class BookingService {
 		this.authenticationService = authenticationService;
 	}
 
-	public ResponseEntity<String> loginAndBookClass(RestTemplate restTemplate, Booking booking) {
+	public ResponseEntity<String> authenticateAndBookClass(RestTemplate restTemplate, Booking booking) {
 
-		HttpEntity authorizedEntity = authenticationService.login(restTemplate, booking.getUser());
+		HttpEntity authorizedEntity = authenticationService.authenticate(restTemplate, booking.getUser());
 		return bookClass(restTemplate, booking, authorizedEntity);
 	}
 
