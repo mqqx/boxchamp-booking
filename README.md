@@ -20,4 +20,4 @@ Java 8 and Maven are required to build the application.
 
 `username` = your boxchamp username which is basically your e-mail address  
 `password` = your users password  
-`classType` = the type of class you want to book in advance (currently `Endurance` and `Olympic_Lifting` are supported)
+`classType` = the type of class you want to book in advance (currently `ENDURANCE` and `OLYMPIC_WEIGHTLIFTING` are supported)
