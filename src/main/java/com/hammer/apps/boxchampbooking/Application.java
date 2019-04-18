@@ -57,7 +57,9 @@ public class Application {
 				user.setUsername(username);
 				user.setPassword(password);
 
-				Booking booking = new Booking(user, classType);
+				Booking booking = new Booking();
+				booking.setUser(user);
+				booking.setType(classType);
 				bookingService.authenticateAndBookClass(restTemplate, booking);
 			}
 		};
