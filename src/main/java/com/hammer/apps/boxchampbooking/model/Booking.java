@@ -23,7 +23,7 @@ public class Booking {
 	@ManyToOne
 	private User user;
 	private DayOfWeek dayOfWeek;
-	private ClassType type;
+	private ClassType classType;
 	private LocalTime time;
 
 }
