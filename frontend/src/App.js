@@ -20,9 +20,11 @@ class BookingForm extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			dayOfWeek: '',
-			classType: '',
-			time: ''
+			booking: {
+				dayOfWeek: '',
+				classType: '',
+				time: ''
+			}
 		};
 
 		this.handleChange = this.handleChange.bind(this);
@@ -33,15 +35,36 @@ class BookingForm extends Component {
 		const target = event.target;
 		const value = target.value;
 		const name = target.name;
+		const booking = this.state.booking;
+		booking[name] = value;
 
 		this.setState({
-			[name]: value
+			booking: booking
 		});
 	}
 
 	handleSubmit(event) {
-		alert('Your favorite flavor is: ' + this.state.value);
 		event.preventDefault();
+
+		fetch('/bookings', {
+			method: 'POST',
+			headers: {
+				Accept: 'application/json',
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify(this.state.booking)
+		})
+			.then((response) =>
+				response.json()
+			)
+			.then((data) => {
+				this.setState({
+					booking: data
+				});
+			})
+			.catch((error) => {
+				console.error(error);
+			});
 	}
 
 	render() {
@@ -49,15 +72,15 @@ class BookingForm extends Component {
 			<Form onSubmit={this.handleSubmit}>
 				<Form.Row>
 					<DayOfWeekSelect
-						value={this.state.dayOfWeek}
+						value={this.state.booking.dayOfWeek}
 						onChange={this.handleChange}
 					/>
 					<ClassSelect
-						value={this.state.classType}
+						value={this.state.booking.classType}
 						onChange={this.handleChange}
 					/>
 					<TimeSelect
-						value={this.state.time}
+						value={this.state.booking.time}
 						onChange={this.handleChange}
 					/>
 				</Form.Row>
@@ -81,21 +104,25 @@ class DayOfWeekSelect extends Component {
 
 	componentDidMount() {
 		fetch('/bookings/daysOfWeek')
-			.then(response => response.json())
-			.then(data => this.setState({daysOfWeek: data}));
+			.then(response =>
+				response.json()
+			)
+			.then(data =>
+				this.setState({daysOfWeek: data})
+			);
 	};
 
 	render() {
 		return (
 			<Form.Group as={Col}>
 				<Form.Label>
-					Wochentag:
+					Wochentag
 				</Form.Label>
 				<Form.Control
 					required
 					as="select"
 					name="dayOfWeek"
-					value={this.props.dayOfWeek}
+					value={this.props.value}
 					onChange={this.props.onChange}>
 					<option value=''/>
 					{this.state.daysOfWeek.map(dayOfWeek => <option key={dayOfWeek}>{dayOfWeek}</option>)}
@@ -116,21 +143,25 @@ class ClassSelect extends Component {
 
 	componentDidMount() {
 		fetch('/bookings/classTypes')
-			.then(response => response.json())
-			.then(data => this.setState({classTypes: data}));
+			.then(response =>
+				response.json()
+			)
+			.then(data =>
+				this.setState({classTypes: data})
+			);
 	};
 
 	render() {
 		return (
 			<Form.Group as={Col}>
 				<Form.Label>
-					Klasse:
+					Klasse
 				</Form.Label>
 				<Form.Control
 					required
 					as="select"
 					name="classType"
-					value={this.props.classType}
+					value={this.props.value}
 					onChange={this.props.onChange}>
 					<option value=''/>
 					{this.state.classTypes.map(classType => <option key={classType}>{classType}</option>)}
@@ -151,21 +182,25 @@ class TimeSelect extends Component {
 
 	componentDidMount() {
 		fetch('/bookings/times')
-			.then(response => response.json())
-			.then(data => this.setState({times: data}));
+			.then(response =>
+				response.json()
+			)
+			.then(data =>
+				this.setState({times: data})
+			);
 	};
 
 	render() {
 		return (
 			<Form.Group as={Col}>
 				<Form.Label>
-					Uhrzeit:
+					Uhrzeit
 				</Form.Label>
 				<Form.Control
 					required
 					as="select"
 					name="time"
-					value={this.props.time}
+					value={this.props.value}
 					onChange={this.props.onChange}>
 					<option value=''/>
 					{this.state.times.map(time => <option key={time}>{time}</option>)}
