@@ -98,4 +98,8 @@ public class BookingService {
 //		return bookingRepository.findAllByUserUsername("user");
 		return bookingRepository.findAll();
 	}
+
+	public Booking createBooking(Booking booking) {
+		return bookingRepository.save(booking);
+	}
 }
