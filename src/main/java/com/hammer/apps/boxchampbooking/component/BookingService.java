@@ -6,7 +6,6 @@ import com.hammer.apps.boxchampbooking.model.ClassType;
 import com.hammer.apps.boxchampbooking.util.AppUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
@@ -29,12 +28,13 @@ public class BookingService {
 	private static final String CLASS_LIST_PATH = "classlist?date=";
 	private static final String CLASS_BOOKING_PATH = "classlist/athlete/book/";
 
-	@Autowired
 	private final AuthenticationService authenticationService;
+	private final BookingRepository bookingRepository;
 
 
-	public BookingService(AuthenticationService authenticationService) {
+	public BookingService(AuthenticationService authenticationService, BookingRepository bookingRepository) {
 		this.authenticationService = authenticationService;
+		this.bookingRepository = bookingRepository;
 	}
 
 	public ResponseEntity<String> authenticateAndBookClass(RestTemplate restTemplate, Booking booking) {
@@ -94,4 +94,8 @@ public class BookingService {
 	}
 
 
+	public Iterable<Booking> getBookings() {
+//		return bookingRepository.findAllByUserUsername("user");
+		return bookingRepository.findAll();
+	}
 }
