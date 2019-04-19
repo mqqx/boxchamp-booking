@@ -1,5 +1,8 @@
 import React, {Component} from 'react';
 import './App.css';
+import Form from "react-bootstrap/Form";
+import Button from "react-bootstrap/Button";
+import Col from "react-bootstrap/Col";
 
 class App extends Component {
 
@@ -43,21 +46,25 @@ class BookingForm extends Component {
 
 	render() {
 		return (
-			<form onSubmit={this.handleSubmit}>
-				<DayOfWeekSelect
-					value={this.state.dayOfWeek}
-					onChange={this.handleChange}
-				/><br/>
-				<ClassSelect
-					value={this.state.classType}
-					onChange={this.handleChange}
-				/><br/>
-				<TimeSelect
-					value={this.state.time}
-					onChange={this.handleChange}
-				/><br/>
-				<input type="submit" value="Submit"/>
-			</form>
+			<Form onSubmit={this.handleSubmit}>
+				<Form.Row>
+					<DayOfWeekSelect
+						value={this.state.dayOfWeek}
+						onChange={this.handleChange}
+					/>
+					<ClassSelect
+						value={this.state.classType}
+						onChange={this.handleChange}
+					/>
+					<TimeSelect
+						value={this.state.time}
+						onChange={this.handleChange}
+					/>
+				</Form.Row>
+				<Button variant="primary" type="submit">
+					Speichern
+				</Button>
+			</Form>
 		);
 	}
 }
@@ -80,16 +87,20 @@ class DayOfWeekSelect extends Component {
 
 	render() {
 		return (
-			<label>
-				Wochentag:
-				<select
+			<Form.Group as={Col}>
+				<Form.Label>
+					Wochentag:
+				</Form.Label>
+				<Form.Control
+					required
+					as="select"
 					name="dayOfWeek"
 					value={this.props.dayOfWeek}
 					onChange={this.props.onChange}>
 					<option value=''/>
 					{this.state.daysOfWeek.map(dayOfWeek => <option key={dayOfWeek}>{dayOfWeek}</option>)}
-				</select>
-			</label>
+				</Form.Control>
+			</Form.Group>
 		);
 	}
 }
@@ -111,16 +122,20 @@ class ClassSelect extends Component {
 
 	render() {
 		return (
-			<label>
-				Klasse:
-				<select
+			<Form.Group as={Col}>
+				<Form.Label>
+					Klasse:
+				</Form.Label>
+				<Form.Control
+					required
+					as="select"
 					name="classType"
 					value={this.props.classType}
 					onChange={this.props.onChange}>
 					<option value=''/>
 					{this.state.classTypes.map(classType => <option key={classType}>{classType}</option>)}
-				</select>
-			</label>
+				</Form.Control>
+			</Form.Group>
 		);
 	}
 }
@@ -142,16 +157,20 @@ class TimeSelect extends Component {
 
 	render() {
 		return (
-			<label>
-				Uhrzeit:
-				<select
+			<Form.Group as={Col}>
+				<Form.Label>
+					Uhrzeit:
+				</Form.Label>
+				<Form.Control
+					required
+					as="select"
 					name="time"
 					value={this.props.time}
 					onChange={this.props.onChange}>
 					<option value=''/>
 					{this.state.times.map(time => <option key={time}>{time}</option>)}
-				</select>
-			</label>
+				</Form.Control>
+			</Form.Group>
 		);
 	}
 }
@@ -174,7 +193,7 @@ class BookingTable extends Component {
 		const bookings = this.state.bookings.map(booking =>
 			<BookingRow key={booking.id} value={booking}/>
 		);
-		
+
 		return (
 			<table className="table">
 				<thead>
