@@ -44,7 +44,7 @@ public class BookingService {
 	}
 
 	public ResponseEntity<String> bookClass(RestTemplate restTemplate, Booking booking, HttpEntity authorizedEntity) {
-		String classId = getClassId(restTemplate, authorizedEntity, booking.getType());
+		String classId = getClassId(restTemplate, authorizedEntity, booking.getClassType());
 
 		String bookingUrl = AppUtils.buildUrl(CLASS_BOOKING_PATH + classId);
 

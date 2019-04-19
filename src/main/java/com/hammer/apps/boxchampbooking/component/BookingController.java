@@ -29,13 +29,13 @@ public class BookingController {
 	}
 
 
-	@GetMapping("days")
-	public DayOfWeek[] getDays() {
+	@GetMapping("daysOfWeek")
+	public DayOfWeek[] getDaysOfWeek() {
 		return DayOfWeek.values();
 	}
 
-	@GetMapping("classes")
-	public ClassType[] getClasses() {
+	@GetMapping("classTypes")
+	public ClassType[] getClassTypes() {
 		return ClassType.values();
 	}
 
