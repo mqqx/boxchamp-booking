@@ -1,5 +1,6 @@
 package com.hammer.apps.boxchampbooking.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -20,6 +21,7 @@ public class Booking {
 	@GeneratedValue
 	private Integer id;
 
+	@JsonIgnore
 	@ManyToOne
 	private User user;
 	private DayOfWeek dayOfWeek;
