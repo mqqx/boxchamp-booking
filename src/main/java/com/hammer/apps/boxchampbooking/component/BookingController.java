@@ -2,9 +2,10 @@ package com.hammer.apps.boxchampbooking.component;
 
 import com.hammer.apps.boxchampbooking.model.Booking;
 import com.hammer.apps.boxchampbooking.model.ClassType;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -27,12 +28,22 @@ public class BookingController {
 
 	@GetMapping
 	public Iterable<Booking> getBookings() {
-		return bookingService.getBookings();
+		return bookingService.findAll();
 	}
 
 	@PostMapping
-	public Booking createBooking(@RequestBody Booking booking) {
-		return bookingService.createBooking(booking);
+	public Booking save(Booking booking) {
+		return bookingService.save(booking);
+	}
+
+	@PutMapping
+	public Booking update(Booking booking) {
+		return save(booking);
+	}
+
+	@DeleteMapping
+	public void delete(Booking booking) {
+		bookingService.delete(booking);
 	}
 
 
