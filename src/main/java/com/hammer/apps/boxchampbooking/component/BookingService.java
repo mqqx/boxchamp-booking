@@ -94,12 +94,16 @@ public class BookingService {
 	}
 
 
-	public Iterable<Booking> getBookings() {
+	public Iterable<Booking> findAll() {
 //		return bookingRepository.findAllByUserUsername("user");
 		return bookingRepository.findAll();
 	}
 
-	public Booking createBooking(Booking booking) {
+	public Booking save(Booking booking) {
 		return bookingRepository.save(booking);
+	}
+
+	public void delete(Booking booking) {
+		bookingRepository.delete(booking);
 	}
 }
