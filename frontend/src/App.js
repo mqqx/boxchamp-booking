@@ -3,6 +3,11 @@ import './App.css';
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import Col from "react-bootstrap/Col";
+import {library} from '@fortawesome/fontawesome-svg-core'
+import {faEdit, faTrash} from "@fortawesome/free-solid-svg-icons";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+
+library.add(faEdit, faTrash);
 
 class App extends Component {
 
@@ -236,6 +241,8 @@ class BookingTable extends Component {
 					<th>Wochentag</th>
 					<th>Klasse</th>
 					<th>Uhrzeit</th>
+					<th/>
+					<th/>
 				</tr>
 				</thead>
 				<tbody>
@@ -255,6 +262,8 @@ class BookingRow extends Component {
 					<td>{this.props.value.dayOfWeek}</td>
 					<td>{this.props.value.classType}</td>
 					<td>{this.props.value.time}</td>
+					<td><FontAwesomeIcon icon="edit"/></td>
+					<td><FontAwesomeIcon icon="trash"/></td>
 				</tr>
 			</>
 		)
