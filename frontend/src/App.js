@@ -6,6 +6,7 @@ import Col from "react-bootstrap/Col";
 import {library} from '@fortawesome/fontawesome-svg-core'
 import {faEdit, faTrash} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import Table from "react-bootstrap/Table";
 
 library.add(faEdit, faTrash);
 
@@ -221,6 +222,28 @@ class BookingTable extends Component {
 		this.state = {
 			bookings: []
 		};
+
+		this.onDelete = this.onDelete.bind(this);
+	}
+
+	onDelete(booking) {
+		fetch('/bookings', {
+			method: 'DELETE',
+			headers: {
+				Accept: 'application/json',
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify(booking)
+		})
+			.then(() => {
+				let updatedBookings = this.state.bookings.filter(i => i.id !== booking.id);
+				this.setState({
+					bookings: updatedBookings
+				});
+			})
+			.catch((error) => {
+				console.error(error);
+			});
 	}
 
 	componentDidMount() {
@@ -231,11 +254,11 @@ class BookingTable extends Component {
 
 	render() {
 		const bookings = this.state.bookings.map(booking =>
-			<BookingRow key={booking.id} value={booking}/>
+			<BookingRow key={booking.id} value={booking} onDelete={this.onDelete}/>
 		);
 
 		return (
-			<table className="table">
+			<Table>
 				<thead>
 				<tr>
 					<th>Wochentag</th>
@@ -248,22 +271,41 @@ class BookingTable extends Component {
 				<tbody>
 				{bookings}
 				</tbody>
-			</table>
+			</Table>
 		)
 	}
 }
 
 class BookingRow extends Component {
 
+	constructor(props) {
+		super(props);
+		this.handleDelete = this.handleDelete.bind(this);
+	}
+
+	handleDelete() {
+		this.props.onDelete(this.props.value);
+	}
+
 	render() {
 		return (
 			<>
 				<tr>
-					<td>{this.props.value.dayOfWeek}</td>
-					<td>{this.props.value.classType}</td>
-					<td>{this.props.value.time}</td>
-					<td><FontAwesomeIcon icon="edit"/></td>
-					<td><FontAwesomeIcon icon="trash"/></td>
+					<td className="align-middle">{this.props.value.dayOfWeek}</td>
+					<td className="align-middle">{this.props.value.classType}</td>
+					<td className="align-middle">{this.props.value.time}</td>
+					<td>
+						<Button variant="link"
+								onClick={() => console.log('this is:', this)}>
+							<FontAwesomeIcon icon="edit"/>
+						</Button>
+					</td>
+					<td>
+						<Button variant="link"
+								onClick={this.handleDelete}>
+							<FontAwesomeIcon icon="trash"/>
+						</Button>
+					</td>
 				</tr>
 			</>
 		)
