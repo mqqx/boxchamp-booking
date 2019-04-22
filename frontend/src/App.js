@@ -15,9 +15,83 @@ class App extends Component {
 	render() {
 		return (
 			<div className="App">
-				<BookingForm/>
-				<BookingTable/>
+				<Booking/>
 			</div>
+		);
+	}
+}
+
+class Booking extends Component {
+
+	constructor(props) {
+		super(props);
+		this.state = {
+			bookings: []
+		};
+
+		this.onDelete = this.onDelete.bind(this);
+		this.onSubmit = this.onSubmit.bind(this);
+	}
+
+	onDelete(booking) {
+		fetch('/bookings', {
+			method: 'DELETE',
+			headers: {
+				Accept: 'application/json',
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify(booking)
+		})
+			.then(() => {
+				let updatedBookings = this.state.bookings.filter(i => i.id !== booking.id);
+				this.setState({
+					bookings: updatedBookings
+				});
+			})
+			.catch((error) => {
+				console.error(error);
+			});
+	}
+
+	onSubmit(booking) {
+
+		fetch('/bookings', {
+			method: 'POST',
+			headers: {
+				Accept: 'application/json',
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify(booking)
+		})
+			.then((response) =>
+				response.json()
+			)
+			.then((data) => {
+				this.setState({
+						bookings: [...this.state.bookings, data]
+					}
+				);
+			})
+			.catch((error) => {
+				console.error(error);
+			});
+	}
+
+	componentDidMount() {
+		fetch('/bookings')
+			.then(response => response.json())
+			.then(data =>
+				this.setState({
+					bookings: data})
+			);
+	};
+
+	render() {
+		return (
+			<>
+				<BookingForm onSubmit={this.onSubmit}/>
+				<BookingTable value={this.state.bookings} onDelete={this.onDelete}/>
+			</>
 		);
 	}
 }
@@ -51,26 +125,7 @@ class BookingForm extends Component {
 
 	handleSubmit(event) {
 		event.preventDefault();
-
-		fetch('/bookings', {
-			method: 'POST',
-			headers: {
-				Accept: 'application/json',
-				'Content-Type': 'application/json',
-			},
-			body: JSON.stringify(this.state.booking)
-		})
-			.then((response) =>
-				response.json()
-			)
-			.then((data) => {
-				this.setState({
-					booking: data
-				});
-			})
-			.catch((error) => {
-				console.error(error);
-			});
+		this.props.onSubmit(this.state.booking);
 	}
 
 	render() {
@@ -97,7 +152,6 @@ class BookingForm extends Component {
 		);
 	}
 }
-
 
 class DayOfWeekSelect extends Component {
 	constructor(props) {
@@ -219,41 +273,16 @@ class TimeSelect extends Component {
 class BookingTable extends Component {
 	constructor(props) {
 		super(props);
-		this.state = {
-			bookings: []
-		};
 
 		this.onDelete = this.onDelete.bind(this);
 	}
 
 	onDelete(booking) {
-		fetch('/bookings', {
-			method: 'DELETE',
-			headers: {
-				Accept: 'application/json',
-				'Content-Type': 'application/json',
-			},
-			body: JSON.stringify(booking)
-		})
-			.then(() => {
-				let updatedBookings = this.state.bookings.filter(i => i.id !== booking.id);
-				this.setState({
-					bookings: updatedBookings
-				});
-			})
-			.catch((error) => {
-				console.error(error);
-			});
+		this.props.onDelete(booking);
 	}
 
-	componentDidMount() {
-		fetch('/bookings')
-			.then(response => response.json())
-			.then(data => this.setState({bookings: data}));
-	};
-
 	render() {
-		const bookings = this.state.bookings.map(booking =>
+		const bookings = this.props.value.map(booking =>
 			<BookingRow key={booking.id} value={booking} onDelete={this.onDelete}/>
 		);
 
