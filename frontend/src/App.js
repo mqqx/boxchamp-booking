@@ -82,7 +82,8 @@ class Booking extends Component {
 			.then(response => response.json())
 			.then(data =>
 				this.setState({
-					bookings: data})
+					bookings: data
+				})
 			);
 	};
 
@@ -318,25 +319,23 @@ class BookingRow extends Component {
 
 	render() {
 		return (
-			<>
-				<tr>
-					<td className="align-middle">{this.props.value.dayOfWeek}</td>
-					<td className="align-middle">{this.props.value.classType}</td>
-					<td className="align-middle">{this.props.value.time}</td>
-					<td>
-						<Button variant="link"
-								onClick={() => console.log('this is:', this)}>
-							<FontAwesomeIcon icon="edit"/>
-						</Button>
-					</td>
-					<td>
-						<Button variant="link"
-								onClick={this.handleDelete}>
-							<FontAwesomeIcon icon="trash"/>
-						</Button>
-					</td>
-				</tr>
-			</>
+			<tr>
+				<td className="align-middle">{this.props.value.dayOfWeek}</td>
+				<td className="align-middle">{this.props.value.classType}</td>
+				<td className="align-middle">{this.props.value.time}</td>
+				<td>
+					<Button variant="link"
+							onClick={() => console.log('this is:', this)}>
+						<FontAwesomeIcon icon="edit"/>
+					</Button>
+				</td>
+				<td>
+					<Button variant="link"
+							onClick={this.handleDelete}>
+						<FontAwesomeIcon icon="trash"/>
+					</Button>
+				</td>
+			</tr>
 		)
 	}
 }
