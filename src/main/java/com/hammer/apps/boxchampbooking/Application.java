@@ -15,6 +15,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestTemplate;
 
+import java.time.LocalTime;
 import java.util.List;
 
 @SpringBootApplication
@@ -23,6 +24,7 @@ public class Application {
 	private static final String ARGUMENT_USERNAME = "username";
 	private static final String ARGUMENT_PASSWORD = "password";
 	private static final String ARGUMENT_CLASS_TYPE = "classType";
+	private static final String ARGUMENT_TIME = "time";
 
 	private final BookingService bookingService;
 
@@ -52,6 +54,7 @@ public class Application {
 				String password = validateAndGetArgumentValue(args, ARGUMENT_PASSWORD);
 				// convenient toUpperCase call to be more flexible with argument values
 				ClassType classType = ClassType.valueOf(validateAndGetArgumentValue(args, ARGUMENT_CLASS_TYPE).toUpperCase());
+				LocalTime time = LocalTime.parse(validateAndGetArgumentValue(args, ARGUMENT_TIME));
 
 				User user = new User();
 				user.setUsername(username);
@@ -60,6 +63,7 @@ public class Application {
 				Booking booking = new Booking();
 				booking.setUser(user);
 				booking.setClassType(classType);
+				booking.setTime(time);
 				bookingService.authenticateAndBookClass(restTemplate, booking);
 			}
 		};
