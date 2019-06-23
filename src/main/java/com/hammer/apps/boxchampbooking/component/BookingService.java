@@ -1,11 +1,8 @@
 package com.hammer.apps.boxchampbooking.component;
 
-import com.hammer.apps.boxchampbooking.Application;
 import com.hammer.apps.boxchampbooking.model.Booking;
 import com.hammer.apps.boxchampbooking.model.ClassType;
-import com.hammer.apps.boxchampbooking.util.AppUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.hammer.apps.boxchampbooking.util.UrlUtils;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
@@ -19,34 +16,31 @@ import java.util.regex.Pattern;
 
 @Service
 public class BookingService {
-
-	private static final Logger LOGGER = LoggerFactory.getLogger(Application.class);
-
 	private static final String CLASS_LIST_ATHLETE_VIEW_REGEX = ".*?classlist/athlete/view/(.*?)\"";
 	private static final String CLASS_LIST_HOME_PROGRESS_REGEX = ".*?classlist/home/progress_tooltip/(.*?)\"";
 
 	private static final String CLASS_LIST_PATH = "classlist?date=";
 	private static final String CLASS_BOOKING_PATH = "classlist/athlete/book/";
 
-	private final AuthenticationService authenticationService;
+	private final BoxChampAuthenticationService boxChampAuthenticationService;
 	private final BookingRepository bookingRepository;
 
 
-	public BookingService(AuthenticationService authenticationService, BookingRepository bookingRepository) {
-		this.authenticationService = authenticationService;
+	public BookingService(BoxChampAuthenticationService boxChampAuthenticationService, BookingRepository bookingRepository) {
+		this.boxChampAuthenticationService = boxChampAuthenticationService;
 		this.bookingRepository = bookingRepository;
 	}
 
 	public ResponseEntity<String> authenticateAndBookClass(RestTemplate restTemplate, Booking booking) {
 
-		HttpEntity authorizedEntity = authenticationService.authenticate(restTemplate, booking.getUser());
+		HttpEntity authorizedEntity = boxChampAuthenticationService.authenticate(restTemplate, booking.getUser());
 		return bookClass(restTemplate, booking, authorizedEntity);
 	}
 
 	public ResponseEntity<String> bookClass(RestTemplate restTemplate, Booking booking, HttpEntity authorizedEntity) {
 		String classId = getClassId(restTemplate, authorizedEntity, booking.getClassType());
 
-		String bookingUrl = AppUtils.buildUrl(CLASS_BOOKING_PATH + classId);
+		String bookingUrl = UrlUtils.buildUrl(CLASS_BOOKING_PATH + classId);
 
 		return restTemplate.exchange(bookingUrl, HttpMethod.GET, authorizedEntity, String.class);
 	}
@@ -90,20 +84,10 @@ public class BookingService {
 		// search requested class in two weeks
 		LocalDate twoWeeksFromToday = LocalDate.now().plusWeeks(2);
 		String formattedDate = twoWeeksFromToday.format(DateTimeFormatter.ISO_LOCAL_DATE);
-		return AppUtils.buildUrl(CLASS_LIST_PATH + formattedDate);
+		return UrlUtils.buildUrl(CLASS_LIST_PATH + formattedDate);
 	}
 
-
-	public Iterable<Booking> findAll() {
-//		return bookingRepository.findAllByUserUsername("user");
-		return bookingRepository.findAll();
-	}
-
-	public Booking save(Booking booking) {
-		return bookingRepository.save(booking);
-	}
-
-	public void delete(Booking booking) {
-		bookingRepository.delete(booking);
+	public Iterable<Booking> findAllByUsername(String username) {
+		return bookingRepository.findAllByUserUsername(username);
 	}
 }

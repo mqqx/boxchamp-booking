@@ -1,7 +1,7 @@
 package com.hammer.apps.boxchampbooking.component;
 
 import com.hammer.apps.boxchampbooking.model.User;
-import com.hammer.apps.boxchampbooking.util.AppUtils;
+import com.hammer.apps.boxchampbooking.util.UrlUtils;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -17,7 +17,7 @@ import org.springframework.web.client.RestTemplate;
 import java.util.List;
 
 @Service
-public class AuthenticationService {
+public class BoxChampAuthenticationService {
 	private static final String LOGIN_PATH = "home";
 	private static final String QUERY_PARAM_EMAIL = "txEmail";
 	private static final String QUERY_PARAM_PASSWORD = "txPassword";
@@ -37,7 +37,7 @@ public class AuthenticationService {
 
 	private String getSessionCookie(RestTemplate restTemplate, User user) {
 		HttpEntity<MultiValueMap<String, String>> request = buildLoginEntity(user);
-		ResponseEntity<String> loginResponse = restTemplate.postForEntity(AppUtils.buildUrl(LOGIN_PATH), request, String.class);
+		ResponseEntity<String> loginResponse = restTemplate.postForEntity(UrlUtils.buildUrl(LOGIN_PATH), request, String.class);
 		String sessionCookie = extractAndVerifySessionCookie(user, loginResponse);
 		return sessionCookie;
 	}
