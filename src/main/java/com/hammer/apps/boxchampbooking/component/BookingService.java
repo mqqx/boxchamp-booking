@@ -1,7 +1,6 @@
 package com.hammer.apps.boxchampbooking.component;
 
 import com.hammer.apps.boxchampbooking.model.Booking;
-import com.hammer.apps.boxchampbooking.model.ClassType;
 import com.hammer.apps.boxchampbooking.util.UrlUtils;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
@@ -38,7 +37,7 @@ public class BookingService {
 	}
 
 	public ResponseEntity<String> bookClass(RestTemplate restTemplate, Booking booking, HttpEntity authorizedEntity) {
-		String classId = getClassId(restTemplate, authorizedEntity, booking.getClassType());
+		String classId = getClassId(restTemplate, authorizedEntity, booking);
 
 		String bookingUrl = UrlUtils.buildUrl(CLASS_BOOKING_PATH + classId);
 
@@ -46,19 +45,21 @@ public class BookingService {
 	}
 
 
-	public String getClassId(RestTemplate restTemplate, HttpEntity authorizedEntity, ClassType type) {
-		String classType = type.getName();
-
+	public String getClassId(RestTemplate restTemplate, HttpEntity authorizedEntity, Booking booking) {
 		String classSearchUrl = buildClassSearchUrl();
 
 		ResponseEntity<String> classSearchHttpResponse = restTemplate.exchange(classSearchUrl, HttpMethod.GET, authorizedEntity, String.class);
 
-		String classId = extractClassIdFromResponse(classType, classSearchHttpResponse);
+		String classId = extractClassIdFromResponse(booking, classSearchHttpResponse);
 
 		return classId;
 	}
 
-	private String extractClassIdFromResponse(String classType, ResponseEntity<String> classSearchHttpResponse) {
+	private String extractClassIdFromResponse(Booking booking, ResponseEntity<String> classSearchHttpResponse) {
+		String classType = booking.getClassType().getName();
+
+		// TODO implement logic to filter for time first / cut all entries before time maybe?
+
 		String classId = null;
 		Pattern pattern = Pattern.compile(classType + CLASS_LIST_ATHLETE_VIEW_REGEX, Pattern.DOTALL);
 
