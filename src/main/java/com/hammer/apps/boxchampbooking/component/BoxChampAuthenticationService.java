@@ -2,6 +2,8 @@ package com.hammer.apps.boxchampbooking.component;
 
 import com.hammer.apps.boxchampbooking.model.User;
 import com.hammer.apps.boxchampbooking.util.UrlUtils;
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -17,10 +19,11 @@ import org.springframework.web.client.RestTemplate;
 import java.util.List;
 
 @Service
+@FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class BoxChampAuthenticationService {
-	private static final String LOGIN_PATH = "home";
-	private static final String QUERY_PARAM_EMAIL = "txEmail";
-	private static final String QUERY_PARAM_PASSWORD = "txPassword";
+	static String LOGIN_PATH = "home";
+	static String QUERY_PARAM_EMAIL = "txEmail";
+	static String QUERY_PARAM_PASSWORD = "txPassword";
 
 
 	public HttpEntity authenticate(RestTemplate restTemplate, User user) {

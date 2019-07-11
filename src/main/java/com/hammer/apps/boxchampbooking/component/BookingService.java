@@ -2,6 +2,9 @@ package com.hammer.apps.boxchampbooking.component;
 
 import com.hammer.apps.boxchampbooking.model.Booking;
 import com.hammer.apps.boxchampbooking.util.UrlUtils;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
@@ -14,21 +17,17 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Service
+@AllArgsConstructor
+@FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class BookingService {
-	private static final String CLASS_LIST_ATHLETE_VIEW_REGEX = ".*?classlist/athlete/view/(.*?)\"";
-	private static final String CLASS_LIST_HOME_PROGRESS_REGEX = ".*?classlist/home/progress_tooltip/(.*?)\"";
+	static String GREEDY_DOT_REGEX = ".*?";
+	static String GREEDY_CLASS_LIST_ATHLETE_VIEW_REGEX = ".*?classlist/athlete/view/(.*?)\"";
+	static String GREEDY_CLASS_LIST_HOME_PROGRESS_REGEX = ".*?classlist/home/progress_tooltip/(.*?)\"";
+	static String CLASS_LIST_PATH = "classlist?date=";
+	static String CLASS_BOOKING_PATH = "classlist/athlete/book/";
 
-	private static final String CLASS_LIST_PATH = "classlist?date=";
-	private static final String CLASS_BOOKING_PATH = "classlist/athlete/book/";
-
-	private final BoxChampAuthenticationService boxChampAuthenticationService;
-	private final BookingRepository bookingRepository;
-
-
-	public BookingService(BoxChampAuthenticationService boxChampAuthenticationService, BookingRepository bookingRepository) {
-		this.boxChampAuthenticationService = boxChampAuthenticationService;
-		this.bookingRepository = bookingRepository;
-	}
+	BoxChampAuthenticationService boxChampAuthenticationService;
+	BookingRepository bookingRepository;
 
 	public ResponseEntity<String> authenticateAndBookClass(RestTemplate restTemplate, Booking booking) {
 
@@ -56,19 +55,15 @@ public class BookingService {
 	}
 
 	private String extractClassIdFromResponse(Booking booking, ResponseEntity<String> classSearchHttpResponse) {
-		String classType = booking.getClassType().getName();
-
-		// TODO implement logic to filter for time first / cut all entries before time maybe?
-
 		String classId = null;
-		Pattern pattern = Pattern.compile(classType + CLASS_LIST_ATHLETE_VIEW_REGEX, Pattern.DOTALL);
+		Pattern pattern = Pattern.compile(buildRegex(booking, GREEDY_CLASS_LIST_ATHLETE_VIEW_REGEX), Pattern.DOTALL);
 
 		Matcher matcher = pattern.matcher(classSearchHttpResponse.toString());
 
 		if (matcher.find()) {
 			classId = matcher.group(1).trim();
 		} else {
-			pattern = Pattern.compile(classType + CLASS_LIST_HOME_PROGRESS_REGEX, Pattern.DOTALL);
+			pattern = Pattern.compile(buildRegex(booking, GREEDY_CLASS_LIST_HOME_PROGRESS_REGEX), Pattern.DOTALL);
 			matcher = pattern.matcher(classSearchHttpResponse.toString());
 			if (matcher.find()) {
 				classId = matcher.group(1).trim();
@@ -76,9 +71,14 @@ public class BookingService {
 		}
 
 		if (classId == null) {
-			throw new IllegalArgumentException("No " + classType + " class found. Please consider rescheduling.");
+			throw new IllegalArgumentException("No class found. Please consider rescheduling your Booking: " + booking);
 		}
 		return classId;
+	}
+
+	private String buildRegex(Booking booking, String urlRegexPart) {
+		String classType = booking.getClassType().getName();
+		return booking.getTime() + GREEDY_DOT_REGEX + classType + urlRegexPart;
 	}
 
 	private String buildClassSearchUrl() {
