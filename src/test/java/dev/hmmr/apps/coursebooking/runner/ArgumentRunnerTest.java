@@ -27,6 +27,11 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 @FieldDefaults(level = AccessLevel.PRIVATE)
 class ArgumentRunnerTest {
+    private static final String USERNAME = "username";
+    private static final String PASSWORD = "password";
+    private static final String COURSE_ARGUMENT = "course";
+    private static final String STARTS_AT_ARGUMENT = "startsAt";
+
     @Mock
     BoxChampAdapter boxChampAdapter;
 
@@ -54,22 +59,18 @@ class ArgumentRunnerTest {
         ApplicationArguments args = mock(ApplicationArguments.class);
 
         String startsAt = "10:00";
-        String username = "username";
-        String password = "password";
-        String courseArgument = "course";
-        String startsAtArgument = "startsAt";
 
         when(args.getSourceArgs()).thenReturn(new String[]{""});
-        when(args.getOptionValues(username)).thenReturn(singletonList(username));
-        when(args.getOptionValues(password)).thenReturn(singletonList(password));
-        when(args.getOptionValues(courseArgument)).thenReturn(singletonList("OLYMPIC_WEIGHTLIFTING"));
-        when(args.getOptionValues(startsAtArgument)).thenReturn(singletonList(startsAt));
+        when(args.getOptionValues(USERNAME)).thenReturn(singletonList(USERNAME));
+        when(args.getOptionValues(PASSWORD)).thenReturn(singletonList(PASSWORD));
+        when(args.getOptionValues(COURSE_ARGUMENT)).thenReturn(singletonList("OLYMPIC_WEIGHTLIFTING"));
+        when(args.getOptionValues(STARTS_AT_ARGUMENT)).thenReturn(singletonList(startsAt));
 
         sut.run(args);
 
         User user = new User();
-        user.setUsername(username);
-        user.setPassword(password);
+        user.setUsername(USERNAME);
+        user.setPassword(PASSWORD);
 
         Booking expectedBooking = Booking.builder()
                 .user(user)
@@ -84,14 +85,12 @@ class ArgumentRunnerTest {
     void runThrowsOnMissingUsername() {
         ApplicationArguments args = mock(ApplicationArguments.class);
 
-        String username = "username";
-
         when(args.getSourceArgs()).thenReturn(new String[]{""});
-        when(args.getOptionValues(username)).thenReturn(emptyList());
+        when(args.getOptionValues(USERNAME)).thenReturn(emptyList());
 
         Assertions.assertThatExceptionOfType(MissingArgumentException.class)
                 .isThrownBy(() -> sut.run(args))
-                .withMessageContaining(username);
+                .withMessageContaining(USERNAME);
     }
 
     @Test
@@ -99,16 +98,13 @@ class ArgumentRunnerTest {
     void runThrowsOnMissingPassword() {
         ApplicationArguments args = mock(ApplicationArguments.class);
 
-        String username = "username";
-        String password = "password";
-
         when(args.getSourceArgs()).thenReturn(new String[]{""});
-        when(args.getOptionValues(username)).thenReturn(singletonList(username));
-        when(args.getOptionValues(password)).thenReturn(emptyList());
+        when(args.getOptionValues(USERNAME)).thenReturn(singletonList(USERNAME));
+        when(args.getOptionValues(PASSWORD)).thenReturn(emptyList());
 
         Assertions.assertThatExceptionOfType(MissingArgumentException.class)
                 .isThrownBy(() -> sut.run(args))
-                .withMessageContaining(password);
+                .withMessageContaining(PASSWORD);
     }
 
     @Test
@@ -116,18 +112,14 @@ class ArgumentRunnerTest {
     void runThrowsOnMissingCourse() {
         ApplicationArguments args = mock(ApplicationArguments.class);
 
-        String username = "username";
-        String password = "password";
-        String courseArgument = "course";
-
         when(args.getSourceArgs()).thenReturn(new String[]{""});
-        when(args.getOptionValues(username)).thenReturn(singletonList(username));
-        when(args.getOptionValues(password)).thenReturn(singletonList(password));
-        when(args.getOptionValues(courseArgument)).thenReturn(emptyList());
+        when(args.getOptionValues(USERNAME)).thenReturn(singletonList(USERNAME));
+        when(args.getOptionValues(PASSWORD)).thenReturn(singletonList(PASSWORD));
+        when(args.getOptionValues(COURSE_ARGUMENT)).thenReturn(emptyList());
 
         Assertions.assertThatExceptionOfType(MissingArgumentException.class)
                 .isThrownBy(() -> sut.run(args))
-                .withMessageContaining(courseArgument);
+                .withMessageContaining(COURSE_ARGUMENT);
     }
 
     @Test
@@ -135,20 +127,15 @@ class ArgumentRunnerTest {
     void runThrowsOnMissingStartsAt() {
         ApplicationArguments args = mock(ApplicationArguments.class);
 
-        String username = "username";
-        String password = "password";
-        String courseArgument = "course";
-        String startsAtArgument = "startsAt";
-
         when(args.getSourceArgs()).thenReturn(new String[]{""});
-        when(args.getOptionValues(username)).thenReturn(singletonList(username));
-        when(args.getOptionValues(password)).thenReturn(singletonList(password));
-        when(args.getOptionValues(courseArgument)).thenReturn(singletonList("OLYMPIC_WEIGHTLIFTING"));
-        when(args.getOptionValues(startsAtArgument)).thenReturn(emptyList());
+        when(args.getOptionValues(USERNAME)).thenReturn(singletonList(USERNAME));
+        when(args.getOptionValues(PASSWORD)).thenReturn(singletonList(PASSWORD));
+        when(args.getOptionValues(COURSE_ARGUMENT)).thenReturn(singletonList("OLYMPIC_WEIGHTLIFTING"));
+        when(args.getOptionValues(STARTS_AT_ARGUMENT)).thenReturn(emptyList());
 
         Assertions.assertThatExceptionOfType(MissingArgumentException.class)
                 .isThrownBy(() -> sut.run(args))
-                .withMessageContaining(startsAtArgument);
+                .withMessageContaining(STARTS_AT_ARGUMENT);
     }
 
     @Test
@@ -157,22 +144,18 @@ class ArgumentRunnerTest {
         ApplicationArguments args = mock(ApplicationArguments.class);
 
         String startsAt = "10:00";
-        String username = "username";
-        String password = "password";
-        String courseArgument = "course";
-        String startsAtArgument = "startsAt";
 
         when(args.getSourceArgs()).thenReturn(new String[]{""});
-        when(args.getOptionValues(username)).thenReturn(singletonList(username));
-        when(args.getOptionValues(password)).thenReturn(singletonList(password));
-        when(args.getOptionValues(courseArgument)).thenReturn(singletonList("olympic_weightlifting"));
-        when(args.getOptionValues(startsAtArgument)).thenReturn(singletonList(startsAt));
+        when(args.getOptionValues(USERNAME)).thenReturn(singletonList(USERNAME));
+        when(args.getOptionValues(PASSWORD)).thenReturn(singletonList(PASSWORD));
+        when(args.getOptionValues(COURSE_ARGUMENT)).thenReturn(singletonList("olympic_weightlifting"));
+        when(args.getOptionValues(STARTS_AT_ARGUMENT)).thenReturn(singletonList(startsAt));
 
         sut.run(args);
 
         User user = new User();
-        user.setUsername(username);
-        user.setPassword(password);
+        user.setUsername(USERNAME);
+        user.setPassword(PASSWORD);
 
         Booking expectedBooking = Booking.builder()
                 .user(user)
