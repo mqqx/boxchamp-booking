@@ -81,6 +81,33 @@ class ArgumentRunnerTest {
     }
 
     @Test
+    @DisplayName("Should submit booking when course is sent as lowercase.")
+    void runSubmitBookingWithUpperCasingCourse() throws CourseNotFoundException {
+        ApplicationArguments args = mock(ApplicationArguments.class);
+
+        String startsAt = "10:00";
+
+        when(args.getSourceArgs()).thenReturn(new String[]{""});
+        when(args.getOptionValues(USERNAME)).thenReturn(singletonList(USERNAME));
+        when(args.getOptionValues(PASSWORD)).thenReturn(singletonList(PASSWORD));
+        when(args.getOptionValues(COURSE_ARGUMENT)).thenReturn(singletonList("olympic_weightlifting"));
+        when(args.getOptionValues(STARTS_AT_ARGUMENT)).thenReturn(singletonList(startsAt));
+
+        sut.run(args);
+
+        User user = new User();
+        user.setUsername(USERNAME);
+        user.setPassword(PASSWORD);
+
+        Booking expectedBooking = Booking.builder()
+                .user(user)
+                .course(Course.OLYMPIC_WEIGHTLIFTING)
+                .startsAt(startsAt)
+                .build();
+        verify(boxChampAdapter).submitBooking(expectedBooking);
+    }
+
+    @Test
     @DisplayName("Should throw exception when username argument is missing.")
     void runThrowsOnMissingUsername() {
         ApplicationArguments args = mock(ApplicationArguments.class);
@@ -136,32 +163,5 @@ class ArgumentRunnerTest {
         Assertions.assertThatExceptionOfType(MissingArgumentException.class)
                 .isThrownBy(() -> sut.run(args))
                 .withMessageContaining(STARTS_AT_ARGUMENT);
-    }
-
-    @Test
-    @DisplayName("Should submit booking when course is sent as lowercase.")
-    void runSubmitBookingWithUpperCasingCourse() throws CourseNotFoundException {
-        ApplicationArguments args = mock(ApplicationArguments.class);
-
-        String startsAt = "10:00";
-
-        when(args.getSourceArgs()).thenReturn(new String[]{""});
-        when(args.getOptionValues(USERNAME)).thenReturn(singletonList(USERNAME));
-        when(args.getOptionValues(PASSWORD)).thenReturn(singletonList(PASSWORD));
-        when(args.getOptionValues(COURSE_ARGUMENT)).thenReturn(singletonList("olympic_weightlifting"));
-        when(args.getOptionValues(STARTS_AT_ARGUMENT)).thenReturn(singletonList(startsAt));
-
-        sut.run(args);
-
-        User user = new User();
-        user.setUsername(USERNAME);
-        user.setPassword(PASSWORD);
-
-        Booking expectedBooking = Booking.builder()
-                .user(user)
-                .course(Course.OLYMPIC_WEIGHTLIFTING)
-                .startsAt(startsAt)
-                .build();
-        verify(boxChampAdapter).submitBooking(expectedBooking);
     }
 }
