@@ -1,4 +1,4 @@
-package dev.hmmr.apps.coursebooking.application.runner;
+package dev.hmmr.apps.coursebooking.runner;
 
 import dev.hmmr.apps.coursebooking.adapter.boxchamp.BoxChampAdapter;
 import dev.hmmr.apps.coursebooking.exception.CourseNotFoundException;
