@@ -14,10 +14,10 @@ Java 8 and Maven are required to build the application.
 
 1. Clone or download the repository
 2. Maven `mvn install` the project `pom.xml`
-3. Run the *.jar with the username, password and preferred classType arguments like the following example:
+3. Run the *.jar with the username, password and preferred course arguments like the following example:
 
-`java -Xmx64m -Xss256k -jar target/boxchamp-booking-0.0.1-SNAPSHOT.jar --username=myboxchamp@email.com --password=mypassword --classType=endurance`
+`java -Xmx64m -Xss256k -jar target/boxchamp-booking-0.0.1-SNAPSHOT.jar --username=myboxchamp@email.com --password=mypassword --course=endurance`
 
 `username` = your boxchamp username which is basically your e-mail address  
 `password` = your users password  
-`classType` = the type of class you want to book in advance (currently `Endurance`, `Gymnastics` and `Olympic_Lifting` are supported)
+`course` = the type of class you want to book in advance (currently `Endurance`, `Gymnastics` and `Olympic_Lifting` are supported)

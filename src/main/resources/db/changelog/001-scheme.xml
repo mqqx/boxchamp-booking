@@ -1,0 +1,39 @@
+<databaseChangeLog
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+    <changeSet id="1-create-user-table" author="mqqx">
+        <createTable tableName="user">
+            <column name="id" type="int" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="username" type="varchar(255)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="password" type="varchar(255)"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="2-create-booking-table" author="mqqx">
+        <createTable tableName="booking">
+            <column name="id" type="int" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="user_id" type="int">
+                <constraints nullable="false" references="user(id)" foreignKeyName="fk_booking_user_user_id"/>
+            </column>
+            <column name="day_of_week" type="varchar(9)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="course" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="starts_at" type="varchar(5)"/>
+        </createTable>
+
+        <!-- Make sure an user is allowed to take at most one course each day -->
+        <addUniqueConstraint tableName="booking" columnNames="user_id, day_of_week"/>
+    </changeSet>
+
+</databaseChangeLog>
