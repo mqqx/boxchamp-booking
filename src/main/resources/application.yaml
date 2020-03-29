@@ -1,3 +1,10 @@
 box-champ:
   scheme: "https"
   host: "boxchamp.io"
+  weeks-in-advance: 2
+  list-regex: "%s.*?%s.{0,200}?classlist/(athlete/view|home/progress_tooltip)/(.*?)\""
+  list-path: "classlist?date=%s"
+  booking-path: "classlist/athlete/book/%s"
+  login-path: "home"
+  query-param-email: "txEmail"
+  query-param-password: "txPassword"
