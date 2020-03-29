@@ -30,7 +30,6 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
@@ -43,26 +42,28 @@ class BoxChampAdapterTest {
 
     @Mock
     BoxChampHttpClient boxChampHttpClient;
+
+    @Mock
+    BoxChampProperties boxChampProperties;
+
     Clock clock = Clock.fixed(LocalDateTime.of(2019, 1, 1, 0, 0).toInstant(ZoneOffset.UTC), ZoneId.systemDefault());
 
     BoxChampAdapter sut;
 
     @BeforeEach
     void setUp() {
-        sut = new BoxChampAdapter(boxChampAuthenticationService, boxChampHttpClient, clock);
+        sut = new BoxChampAdapter(boxChampAuthenticationService, boxChampHttpClient, boxChampProperties, clock);
     }
 
     @Test
     @DisplayName("Should submit a booking successful to boxchamp")
     void submitBookingSuccessful() throws IOException, CourseNotFoundException {
         HttpEntity<HttpHeaders> authorizedEntity = new HttpEntity<>(new HttpHeaders());
-        User testUser = setUpTestUser();
-        when(boxChampAuthenticationService.authenticate(testUser)).thenReturn(authorizedEntity);
+        Booking booking = setUpMocksAndBooking(authorizedEntity);
 
         String response = createResponseString();
         doReturn(ResponseEntity.of(Optional.of(response))).when(boxChampHttpClient).get("classlist?date=2019-01-15", authorizedEntity);
         doReturn(ResponseEntity.ok("success")).when(boxChampHttpClient).get("classlist/athlete/book/2977005", authorizedEntity);
-        Booking booking = setUpTestBooking(testUser);
 
         boolean isSuccessful = sut.submitBooking(booking);
 
@@ -73,14 +74,12 @@ class BoxChampAdapterTest {
     @DisplayName("Should return false when submit to boxchamp fails")
     void submitBookingFailed() throws IOException, CourseNotFoundException {
         HttpEntity<HttpHeaders> authorizedEntity = new HttpEntity<>(new HttpHeaders());
-        User testUser = setUpTestUser();
-        when(boxChampAuthenticationService.authenticate(eq(testUser))).thenReturn(authorizedEntity);
+        Booking booking = setUpMocksAndBooking(authorizedEntity);
 
         String response = createResponseString();
         doReturn(ResponseEntity.of(Optional.of(response))).when(boxChampHttpClient).get("classlist?date=2019-01-15", authorizedEntity);
         ResponseEntity<String> responseEntity = ResponseEntity.status(HttpStatus.BAD_REQUEST).body("failed");
         doReturn(responseEntity).when(boxChampHttpClient).get("classlist/athlete/book/2977005", authorizedEntity);
-        Booking booking = setUpTestBooking(testUser);
 
         boolean isSuccessful = sut.submitBooking(booking);
 
@@ -92,12 +91,28 @@ class BoxChampAdapterTest {
     void submitBookingThrowsClassIdNotFoundException() {
         HttpEntity<HttpHeaders> authorizedEntity = new HttpEntity<>(new HttpHeaders());
         User testUser = setUpTestUser();
-        when(boxChampAuthenticationService.authenticate(eq(testUser))).thenReturn(authorizedEntity);
+        when(boxChampAuthenticationService.authenticate(testUser)).thenReturn(authorizedEntity);
+        when(boxChampProperties.getListPath()).thenReturn("classlist?date=%s");
+        when(boxChampProperties.getListRegex()).thenReturn("%s.*?%s.{0,200}?classlist/(athlete/view|home/progress_tooltip)/(.*?)\"");
 
         Booking booking = setUpTestBooking(testUser);
 
         assertThatExceptionOfType(CourseNotFoundException.class)
                 .isThrownBy(() -> sut.submitBooking(booking));
+    }
+
+    private Booking setUpMocksAndBooking(HttpEntity<HttpHeaders> authorizedEntity) {
+        User testUser = setUpTestUser();
+        when(boxChampAuthenticationService.authenticate(testUser)).thenReturn(authorizedEntity);
+        mockBoxChampProperties();
+        return setUpTestBooking(testUser);
+    }
+
+    private void mockBoxChampProperties() {
+        when(boxChampProperties.getWeeksInAdvance()).thenReturn(2);
+        when(boxChampProperties.getListPath()).thenReturn("classlist?date=%s");
+        when(boxChampProperties.getListRegex()).thenReturn("%s.*?%s.{0,200}?classlist/(athlete/view|home/progress_tooltip)/(.*?)\"");
+        when(boxChampProperties.getBookingPath()).thenReturn("classlist/athlete/book/%s");
     }
 
     private String createResponseString() throws IOException {

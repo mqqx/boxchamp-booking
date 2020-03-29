@@ -13,4 +13,13 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class BoxChampProperties {
     String host;
     String scheme;
+
+    String listRegex;
+    String listPath;
+    String bookingPath;
+    String loginPath;
+    int weeksInAdvance;
+
+    String queryParamEmail;
+    String queryParamPassword;
 }

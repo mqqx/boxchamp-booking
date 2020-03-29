@@ -3,8 +3,9 @@ package dev.hmmr.apps.coursebooking.adapter.boxchamp;
 import dev.hmmr.apps.coursebooking.exception.CourseNotFoundException;
 import dev.hmmr.apps.coursebooking.model.Booking;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
@@ -20,27 +21,23 @@ import java.util.regex.Pattern;
 import static java.lang.String.format;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
+@EnableConfigurationProperties(BoxChampProperties.class)
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class BoxChampAdapter {
-
-    //TODO make configurable
-    private static final int WEEKS_BOOKING_SHOULD_BE_DONE_IN_ADVANCE = 2;
-    private static final String GREEDY_COURSE_LIST_REGEX = "%s.*?%s.{0,200}?classlist/(athlete/view|home/progress_tooltip)/(.*?)\"";
-    private static final String COURSE_BOOKING_PATH = "classlist/athlete/book/%s";
-    private static final String COURSE_LIST_PATH = "classlist?date=%s";
-
     BoxChampAuthenticationService boxChampAuthenticationService;
     BoxChampHttpClient boxChampHttpClient;
+    BoxChampProperties boxChampProperties;
     Clock clock;
 
     public boolean submitBooking(Booking booking) throws CourseNotFoundException {
         HttpEntity<HttpHeaders> authorizedEntity = boxChampAuthenticationService.authenticate(booking.getUser());
 
         String courseId = selectCourseId(authorizedEntity, booking);
-        String bookingPath = format(COURSE_BOOKING_PATH, courseId);
+        String bookingPath = boxChampProperties.getBookingPath();
+        String bookingPathWithCourseId = format(bookingPath, courseId);
 
-        ResponseEntity<String> response = boxChampHttpClient.get(bookingPath, authorizedEntity);
+        ResponseEntity<String> response = boxChampHttpClient.get(bookingPathWithCourseId, authorizedEntity);
 
         return response.getStatusCode().is2xxSuccessful();
     }
@@ -65,15 +62,19 @@ public class BoxChampAdapter {
 
     private Pattern buildCourseIdExtractPattern(Booking booking) {
         String course = booking.getCourse().getName();
-        String courseIdExtractRegex = format(GREEDY_COURSE_LIST_REGEX, booking.getStartsAt(), course);
+        String listRegex = boxChampProperties.getListRegex();
+        String courseIdExtractRegex = format(listRegex, booking.getStartsAt(), course);
         return Pattern.compile(courseIdExtractRegex, Pattern.DOTALL);
     }
 
     private String buildCourseSearchUrl() {
-        LocalDate twoWeeksFromToday = LocalDate.now(clock)
-                .plusWeeks(WEEKS_BOOKING_SHOULD_BE_DONE_IN_ADVANCE);
-        String formattedDate = twoWeeksFromToday.format(DateTimeFormatter.ISO_LOCAL_DATE);
-        return format(COURSE_LIST_PATH, formattedDate);
+        int weeksInAdvance = boxChampProperties.getWeeksInAdvance();
+        LocalDate weeksInAdvanceFromToday = LocalDate
+                .now(clock)
+                .plusWeeks(weeksInAdvance);
+        String formattedDate = weeksInAdvanceFromToday.format(DateTimeFormatter.ISO_LOCAL_DATE);
+        String listPath = boxChampProperties.getListPath();
+        return format(listPath, formattedDate);
     }
 
 }
