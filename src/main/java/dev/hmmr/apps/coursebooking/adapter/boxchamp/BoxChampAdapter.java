@@ -17,6 +17,8 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static java.lang.String.format;
+
 @Service
 @AllArgsConstructor
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
@@ -24,10 +26,9 @@ public class BoxChampAdapter {
 
     //TODO make configurable
     private static final int WEEKS_BOOKING_SHOULD_BE_DONE_IN_ADVANCE = 2;
-    private static final String COURSE_BOOKING_PATH = "classlist/athlete/book/";
-    private static final String GREEDY_DOT_REGEX = ".*?";
-    private static final String GREEDY_COURSE_LIST_REGEX = ".{0,200}?classlist/(athlete/view|home/progress_tooltip)/(" + GREEDY_DOT_REGEX + ")\"";
-    private static final String COURSE_LIST_PATH = "classlist?date=";
+    private static final String GREEDY_COURSE_LIST_REGEX = "%s.*?%s.{0,200}?classlist/(athlete/view|home/progress_tooltip)/(.*?)\"";
+    private static final String COURSE_BOOKING_PATH = "classlist/athlete/book/%s";
+    private static final String COURSE_LIST_PATH = "classlist?date=%s";
 
     BoxChampAuthenticationService boxChampAuthenticationService;
     BoxChampHttpClient boxChampHttpClient;
@@ -36,7 +37,8 @@ public class BoxChampAdapter {
     public boolean submitBooking(Booking booking) throws CourseNotFoundException {
         HttpEntity<HttpHeaders> authorizedEntity = boxChampAuthenticationService.authenticate(booking.getUser());
 
-        String bookingPath = COURSE_BOOKING_PATH + selectCourseId(authorizedEntity, booking);
+        String courseId = selectCourseId(authorizedEntity, booking);
+        String bookingPath = format(COURSE_BOOKING_PATH, courseId);
 
         ResponseEntity<String> response = boxChampHttpClient.get(bookingPath, authorizedEntity);
 
@@ -63,14 +65,15 @@ public class BoxChampAdapter {
 
     private Pattern buildCourseIdExtractPattern(Booking booking) {
         String course = booking.getCourse().getName();
-        return Pattern.compile(booking.getStartsAt() + GREEDY_DOT_REGEX + course + GREEDY_COURSE_LIST_REGEX, Pattern.DOTALL);
+        String courseIdExtractRegex = format(GREEDY_COURSE_LIST_REGEX, booking.getStartsAt(), course);
+        return Pattern.compile(courseIdExtractRegex, Pattern.DOTALL);
     }
 
     private String buildCourseSearchUrl() {
         LocalDate twoWeeksFromToday = LocalDate.now(clock)
                 .plusWeeks(WEEKS_BOOKING_SHOULD_BE_DONE_IN_ADVANCE);
         String formattedDate = twoWeeksFromToday.format(DateTimeFormatter.ISO_LOCAL_DATE);
-        return COURSE_LIST_PATH + formattedDate;
+        return format(COURSE_LIST_PATH, formattedDate);
     }
 
 }

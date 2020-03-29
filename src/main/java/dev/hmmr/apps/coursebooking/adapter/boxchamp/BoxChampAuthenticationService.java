@@ -11,12 +11,14 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
+
+import static java.lang.String.format;
+import static org.springframework.util.CollectionUtils.isEmpty;
 
 @Service
 @AllArgsConstructor
@@ -26,6 +28,7 @@ class BoxChampAuthenticationService {
     private static final String QUERY_PARAM_EMAIL = "txEmail";
     private static final String QUERY_PARAM_PASSWORD = "txPassword";
     private static final String LOGIN_PATH = "home";
+    private static final String USER_COULD_NOT_BE_AUTHENTICATED_MESSAGE = "User %s could not be authenticated. Please check username/password combination.";
 
     BoxChampHttpClient boxChampHttpClient;
 
@@ -46,15 +49,17 @@ class BoxChampAuthenticationService {
     private String extractAndVerifySessionCookie(User user, ResponseEntity<String> loginResponse) {
         String sessionCookie = "";
         List<String> setCookieValues = loginResponse.getHeaders().get(HttpHeaders.SET_COOKIE);
-        if (!CollectionUtils.isEmpty(setCookieValues)) {
+        if (!isEmpty(setCookieValues)) {
             sessionCookie = setCookieValues.get(setCookieValues.size() - 1);
         }
 
-        boolean hasLoginFailed = loginResponse.hasBody() &&
-                loginResponse.getBody().contains("login_errors");
+        boolean hasLoginFailed = loginResponse.hasBody()
+                && loginResponse.getBody().contains("login_errors");
 
-        if (hasLoginFailed || StringUtils.isEmpty(sessionCookie)) {
-            throw new BadCredentialsException("User " + user.getUsername() + " could not be authenticated. Please check username/password combination.");
+        boolean hasAuthenticationFailed = hasLoginFailed || StringUtils.isEmpty(sessionCookie);
+        if (hasAuthenticationFailed) {
+            String userCouldNotBeAuthenticatedMessage = format(USER_COULD_NOT_BE_AUTHENTICATED_MESSAGE, user.getUsername());
+            throw new BadCredentialsException(userCouldNotBeAuthenticatedMessage);
         }
 
         return sessionCookie;

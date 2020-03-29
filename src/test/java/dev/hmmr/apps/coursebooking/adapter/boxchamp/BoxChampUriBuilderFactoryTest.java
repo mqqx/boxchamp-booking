@@ -36,7 +36,7 @@ class BoxChampUriBuilderFactoryTest {
     }
 
     @Test
-    @DisplayName("Should build uri with given path and scheme + host preset.")
+    @DisplayName("Should build uri with given path and preset scheme and host.")
     void buildUriWithPath() {
         URI uriWithPath = sut.buildUriWithPath(PATH);
 
