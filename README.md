@@ -1,3 +1,4 @@
+![Java CI with Maven](https://github.com/mqqx/boxchamp-booking/workflows/Java%20CI%20with%20Maven/badge.svg?branch=master)
 # boxchamp-booking
 
 Spring Boot command line application to book [boxchamp](https://boxchamp.io/) classes in advance via REST.
